@@ -5,7 +5,7 @@
 
 using namespace std;
 
-int N, M;
+int N, M, A, B, D;
 vector<pair<int, int>> V[1001];
 bool visit[1001];
 
@@ -17,37 +17,33 @@ int main(void)
 	cin >> N >> M;
 	for (int i = 0; i < N - 1; i++)
 	{
-		int a, b, d;
-		cin >> a >> b >> d;
-		V[a].push_back({b, d});
-		V[b].push_back({a, d});
+		cin >> A >> B >> D;
+		V[A].push_back({B, D});
+		V[B].push_back({A, D});
 	}
 	for (int i = 0; i < M; i++)
 	{
-		int a, b;
-		cin >> a >> b;
+		cin >> A >> B;
 		queue<pair<int, int>> q;
 		fill(visit + 1, visit + N + 1, false);
-		for (int j = 0; j < V[a].size(); j++)
+		for (int j = 0; j < V[A].size(); j++)
 		{
-			visit[V[a][j].first] = true;
-			q.push({V[a][j]});
+			visit[V[A][j].first] = true;
+			q.push({V[A][j]});
 		}
 		while (!q.empty())
 		{
 			auto t = q.front(); q.pop();
-			if (t.first == b)
+			if (t.first == B)
 			{
 				cout << t.second << '\n';
 				break;
 			}
 			for (int j = 0; j < V[t.first].size(); j++)
 			{
-				if (!visit[V[t.first][j].first])
-				{
-					visit[V[t.first][j].first] = true;
-					q.push({V[t.first][j].first, t.second + V[t.first][j].second});
-				}
+				if (visit[V[t.first][j].first]) continue;
+				visit[V[t.first][j].first] = true;
+				q.push({V[t.first][j].first, t.second + V[t.first][j].second});
 			}
 		}
 	}
