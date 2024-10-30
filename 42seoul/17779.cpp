@@ -10,7 +10,7 @@ int visit[21][21];
 
 int calculate(int x, int y, int d1, int d2)
 {
-	int size[5] = { 0, 0, 0, 0, 0 };
+	int size[5] = { 0, };
 
 	for (int i = 1; i <= N; i++)
 		fill(visit[i], visit[i] + 21, 0);
@@ -56,46 +56,32 @@ int calculate(int x, int y, int d1, int d2)
 
 	for (int i = 1; i < x + d1; i++) {
 		for (int j = 1; j <= y; j++) {
-			if (!visit[i][j]) {
-				visit[i][j] = 1;
-				size[0] += A[i][j];
-			}
+			if (visit[i][j]) break;
+			visit[i][j] = 1;
+			size[0] += A[i][j];
 		}
 	}
 	for (int i = 1; i <= x + d2; i++) {
-		for (int j = y + 1; j <= N; j++) {
-			if (!visit[i][j]) {
-				visit[i][j] = 2;
-				size[1] += A[i][j];
-			}
+		for (int j = N; j >= y + 1; j--) {
+			if (visit[i][j]) break;
+			visit[i][j] = 2;
+			size[1] += A[i][j];
 		}
 	}
 	for (int i = x + d1; i <= N; i++) {
 		for (int j = 1; j < y - d1 + d2; j++) {
-			if (!visit[i][j]) {
-				visit[i][j] = 3;
-				size[2] += A[i][j];
-			}
+			if (visit[i][j]) break;
+			visit[i][j] = 3;
+			size[2] += A[i][j];
 		}
 	}
 	for (int i = x + d2 + 1; i <= N; i++) {
-		for (int j = y - d1 + d2; j <= N; j++) {
-			if (!visit[i][j]) {
-				visit[i][j] = 4;
-				size[3] += A[i][j];
-			}
+		for (int j = N; j >= y - d1 + d2; j--) {
+			if (visit[i][j]) break;
+			visit[i][j] = 4;
+			size[3] += A[i][j];
 		}
 	}
-
-	// for (int i = 1; i <= N; i++)
-	// {
-	// 	for (int j = 1; j <= N; j++)
-	// 		cout << visit[i][j] << ' ';
-	// 	cout << '\n';
-	// }
-
-	// cout << size[0] << " " << size[1] << " " << size[2] << " " << size[3] << " " << size[4] << '\n';
-
 	return *max_element(size, size + 5) - *min_element(size, size + 5);
 }
 
@@ -114,11 +100,8 @@ int main(void)
 		for (int j = 1; j <= N; j++) {
 			for (int d1 = 1; d1 <= N; d1++) {
 				for (int d2 = 1; d2 <= N; d2++) {
-					if (1 <= i + d1 + d2 && i + d1 + d2 <= N && 1 <= j - d1 && j + d2 <= N) {
-						// cout << i << " " << j << " " << d1 << " " << d2 << '\n';
+					if (1 <= i + d1 + d2 && i + d1 + d2 <= N && 1 <= j - d1 && j + d2 <= N)
 						answer = min(answer, calculate(i, j, d1, d2));
-						// cout << answer << '\n';
-					}
 				}
 			}
 		}
