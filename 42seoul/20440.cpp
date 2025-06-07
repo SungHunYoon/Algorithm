@@ -14,10 +14,10 @@ int main(void) {
 
 	cin >> N;
 	while (N--) {
-	int a, b;
-	cin >> a >> b;
-	M.push_back({a, 1});
-	M.push_back({b, -1});
+		int a, b;
+		cin >> a >> b;
+		M.push_back({a, 1});
+		M.push_back({b, -1});
 	}
 
 	sort(M.begin(), M.end());
