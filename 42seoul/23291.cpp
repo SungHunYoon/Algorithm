@@ -1,10 +1,10 @@
 #include <iostream>
-#include <set>
+#include <queue>
 #include <tuple>
 #include <algorithm>
 
 using namespace std;
-using iiii = tuple<int, int, int, int>;
+using ii = tuple<int, int>;
 
 int N, K;
 int A[101][101];
@@ -13,54 +13,10 @@ int T[101][101];
 int dx[] = {-1, 1, 0, 0};
 int dy[] = {0, 0, -1, 1};
 
-void printArr() {
-	cout << "========= printArr \n";
-	for (int i = 0; i < N; i++) {
-		for (int j = 0; j < N; j++) {
-			cout << A[i][j] << ' ';
-		}
-		cout << '\n';
-	}
-}
-
-void printB() {
-	cout << "========= printB \n";
-	for (int i = 0; i < N; i++) {
-		for (int j = 0; j < N; j++) {
-			cout << B[i][j] << ' ';
-		}
-		cout << '\n';
-	}
-}
-
-void printT() {
-	cout << "======== printT \n";
-	for (int i = 0; i < N; i++) {
-		for (int j = 0; j < N; j++) {
-			cout << T[i][j] << ' ';
-		}
-		cout << '\n';
-	}
-}
-
-void clearA() {
+void clear(int a[101][101]) {
 	for (int i = 0; i < N; i++) {
 		for (int j = 0; j < N; j++)
-			A[i][j] = 0;
-	}
-}
-
-void clearB() {
-	for (int i = 0; i < N; i++) {
-		for (int j = 0; j < N; j++)
-			B[i][j] = 0;
-	}
-}
-
-void clearT() {
-	for (int i = 0; i < N; i++) {
-		for (int j = 0; j < N; j++)
-			T[i][j] = 0;
+			a[i][j] = 0;
 	}
 }
 
@@ -68,14 +24,6 @@ int countCol(int n) {
 	int cnt = 0;
 	for (int i = 0; i < N; i++) {
 		if (A[i][n]) cnt++;
-	}
-	return cnt;
-}
-
-int countTCol(int n) {
-	int cnt = 0;
-	for (int i = 0; i < N; i++) {
-		if (T[i][n]) cnt++;
 	}
 	return cnt;
 }
@@ -108,8 +56,8 @@ void rotateArr() {
 	
 	int R = N;
 	while (1) {
-		clearB();
-		clearT();
+		clear(B);
+		clear(T);
 		int cut = 0;
 		int maxCol = 0;
 		for (int i = 0; i < N; i++, cut++) {
@@ -153,28 +101,27 @@ void rotateArr() {
 }
 
 void calDiff() {
-	set<iiii> S;
-	clearT();
-	for (int i = 0; i < N; i++) {
-		for (int j = 0; j < N; j++) {
-			if (!A[i][j]) continue;
-			for (int k = 0; k < 4; k++) {
-				int nx = i + dx[k];
-				int ny = j + dy[k];
-				if (0 > nx || nx >= N || 0 > ny || ny >= N) continue;
-				if (!A[nx][ny]) continue;
-				if (S.find({i, j, nx, ny}) != S.end()) continue;
-				S.insert({i, j, nx, ny});
-				S.insert({nx, ny, i, j});
-				int d = abs(A[i][j] - A[nx][ny]) / 5;
-				if (d == 0) continue;
-				if (A[i][j] > A[nx][ny]) {
-					T[i][j] -= d;
-					T[nx][ny] += d;
-				} else {
-					T[i][j] += d;
-					T[nx][ny] -= d;
-				}
+	queue<ii> q;
+	clear(T);
+	clear(B);
+	B[0][0] = 1;
+	q.push({0, 0});
+	while (!q.empty()) {
+		auto [x, y] = q.front(); q.pop();
+		for (int i = 0; i < 4; i++) {
+			int nx = x + dx[i];
+			int ny = y + dy[i];
+			if (0 > nx || nx >= N || 0 > ny || ny >= N) continue;
+			if (!A[nx][ny] || B[nx][ny]) continue;
+			int d = abs(A[x][y] - A[nx][ny]) / 5;
+			if (d == 0) continue;
+			B[nx][ny] = 1;
+			if (A[x][y] > A[nx][ny]) {
+				T[x][y] -= d;
+				T[nx][ny] += d;
+			} else {
+				T[x][y] += d;
+				T[nx][ny] -= d;
 			}
 		}
 	}
@@ -186,7 +133,7 @@ void calDiff() {
 }
 
 void serialize() {
-	clearB();
+	clear(B);
 	int idx = 0;
 	for (int i = 0; i < N; i++) {
 		for (int j = 0; j < N; j++) {
@@ -194,7 +141,7 @@ void serialize() {
 			B[0][idx++] = A[j][i];
 		}
 	}
-	clearA();
+	clear(A);
 	for (int i = 0; i < N; i++) {
 		A[0][i] = B[0][i];
 	}
@@ -205,8 +152,8 @@ void divideArr() {
 	int P = 2;
 	while (P--) {
 		int pvt = R / 2;
-		clearB();
-		clearT();
+		clear(B);
+		clear(T);
 		int col = countCol(0);
 		for (int k = 0; k < col; k++) {
 			for (int i = 0; i < pvt; i++)
@@ -225,7 +172,7 @@ void divideArr() {
 				}
 			}
 		}
-		clearB();
+		clear(B);
 		int idx = 0;
 		for (int k = 0; k < col; k++) {
 			for (int i = pvt, j = 0; i < N; i++, j++)
@@ -237,7 +184,7 @@ void divideArr() {
 				B[idx][j] = T[k][i];
 			idx++;
 		}
-		clearA();
+		clear(A);
 		for (int i = 0; i < N; i++) {
 			for (int j = 0; j < N; j++) {
 				A[i][j] = B[i][j];
